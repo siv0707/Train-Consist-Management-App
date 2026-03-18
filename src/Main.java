@@ -1,39 +1,41 @@
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 class TrainConsistApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management App: UC4 ===");
+        System.out.println("=== Train Consist Management App: UC5 ===");
 
-        // 1. Initialize a LinkedList to represent the physical chain of bogies
-        // LinkedList is ideal for frequently adding/removing at the ends
-        LinkedList<String> trainConsist = new LinkedList<>();
+        // 1. Initialize a LinkedHashSet
+        // This combines a HashTable (for uniqueness) and a LinkedList (for order)
+        Set<String> trainFormation = new LinkedHashSet<>();
 
-        // 2. Add initial bogies using addLast (standard coupling)
-        trainConsist.add("Sleeper");
-        trainConsist.add("AC Coach");
-        trainConsist.add("Cargo");
+        // 2. Attach bogies in a specific physical sequence
+        System.out.println("Attaching bogies to the engine...");
+        trainFormation.add("Engine (Locomotive)");
+        trainFormation.add("Sleeper");
+        trainFormation.add("Cargo");
+        trainFormation.add("Guard Coach");
 
-        // 3. Add Engine at the very front and Guard at the very end
-        trainConsist.addFirst("Locomotive (Engine)");
-        trainConsist.addLast("Guard Van");
+        // 3. Attempt to attach a duplicate bogie (Business Rule Violation)
+        // In UC4 (LinkedList), this would have added a second Sleeper.
+        // Here, it will be automatically rejected.
+        System.out.println("\nError Check: Attempting to attach duplicate 'Sleeper'...");
+        boolean isAdded = trainFormation.add("Sleeper");
 
-        System.out.println("Initial Formation: " + trainConsist);
+        if (!isAdded) {
+            System.out.println("System Alert: Duplicate bogie detected. Attachment rejected.");
+        }
 
-        // 4. Insert a Pantry Car at a specific position (Index 2)
-        // This demonstrates the ability to break the chain and insert in the middle
-        System.out.println("\nInserting Pantry Car at position 2...");
-        trainConsist.add(2, "Pantry Car");
+        // 4. Display the formation
+        // Notice how the order is preserved exactly as they were added
+        System.out.println("\nFinal Train Formation (Maintained Order):");
+        System.out.println(trainFormation);
 
-        System.out.println("After Insertion: " + trainConsist);
-
-        // 5. Remove the first and last bogies (e.g., changing engines or removing guard)
-        System.out.println("\nDetaching Engine and Guard Van for maintenance...");
-        trainConsist.removeFirst();
-        trainConsist.removeLast();
-
-        // 6. Display the final ordered consist
-        System.out.println("Final Ordered Consist: " + trainConsist);
-        System.out.println("Current Train Length: " + trainConsist.size() + " units.");
+        // 5. Demonstrate iteration (Ordered traversal)
+        System.out.println("\nScanning Train Consist:");
+        for (String bogie : trainFormation) {
+            System.out.println("Checking: " + bogie);
+        }
     }
 }
