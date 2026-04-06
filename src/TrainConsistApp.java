@@ -1,56 +1,67 @@
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.*;
 
 /**
- * UC11: Validate Train ID & Cargo Codes (Regex)
- * This class ensures that all input follows strict railway formatting rules.
+ * UC12: Safety Compliance Check for Goods Bogies
+ * Enforces domain rules: Cylindrical bogies MUST carry Petroleum.
  */
-public class TrainConsistApp {
+class GoodsBogie {
+    private String type;  // e.g., "Cylindrical", "Open", "Box"
+    private String cargo; // e.g., "Petroleum", "Coal", "Grain"
 
-    // Regex Patterns:
-    // TRN-\\d{4} ensures "TRN-" followed by exactly 4 digits.
-    // PET-[A-Z]{2} ensures "PET-" followed by exactly 2 uppercase letters.
-    private static final String TRAIN_ID_REGEX = "TRN-\\d{4}";
-    private static final String CARGO_CODE_REGEX = "PET-[A-Z]{2}";
-
-    public static void main(String[] args) {
-        // Test Data for Train IDs
-        String[] testTrainIDs = {"TRN-1234", "TRAIN12", "TRN-123", "TRN-5566A", "1234-TRN"};
-
-        // Test Data for Cargo Codes
-        String[] testCargoCodes = {"PET-AB", "PET-bc", "PET12", "PET-XYZ", "PET-XY"};
-
-        System.out.println("=== Railway Input Validation (UC11) ===");
-
-        // Validate Train IDs
-        System.out.println("\n--- Validating Train IDs (Required: TRN-DDDD) ---");
-        for (String id : testTrainIDs) {
-            checkFormat(id, TRAIN_ID_REGEX, "Train ID");
-        }
-
-        // Validate Cargo Codes
-        System.out.println("\n--- Validating Cargo Codes (Required: PET-AA) ---");
-        for (String code : testCargoCodes) {
-            checkFormat(code, CARGO_CODE_REGEX, "Cargo Code");
-        }
-
-        System.out.println("\nValidation process complete. Only '✔ Valid' data will be processed.");
+    public GoodsBogie(String type, String cargo) {
+        this.type = type;
+        this.cargo = cargo;
     }
 
-    /**
-     * core validation logic using Pattern and Matcher
-     */
-    private static void checkFormat(String input, String regex, String type) {
-        // Compile the regex pattern
-        Pattern pattern = Pattern.compile(regex);
-        // Create matcher for the input string
-        Matcher matcher = pattern.matcher(input);
+    public String getType() { return type; }
+    public String getCargo() { return cargo; }
 
-        // matches() checks the ENTIRE string against the pattern
-        if (matcher.matches()) {
-            System.out.println("✔ Valid " + type + ": " + input);
+    @Override
+    public String toString() {
+        return String.format("[%s Bogie | Cargo: %s]", type, cargo);
+    }
+}
+
+public class TrainConsistApp {
+    public static void main(String[] args) {
+        // 1. Prepare a list of goods bogies (Scenario: Mixed Cargo)
+        List<GoodsBogie> goodsConsist = new ArrayList<>();
+        goodsConsist.add(new GoodsBogie("Open", "Coal"));
+        goodsConsist.add(new GoodsBogie("Box", "Grain"));
+        goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+
+        System.out.println("--- Current Goods Train Formation ---");
+        goodsConsist.forEach(System.out::println);
+
+        // 2. Safety Validation Rule using Stream.allMatch()
+        // Rule: If Type is "Cylindrical", Cargo MUST be "Petroleum".
+        boolean isSafe = goodsConsist.stream().allMatch(bogie -> {
+            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
+                return bogie.getCargo().equalsIgnoreCase("Petroleum");
+            }
+            return true; // Other bogie types pass this specific rule
+        });
+
+        // 3. Display Safety Result
+        System.out.println("\n--- Safety Compliance Report ---");
+        if (isSafe) {
+            System.out.println("STATUS: ✔ SAFE");
+            System.out.println("Message: All cylindrical bogies are carrying approved liquid cargo.");
         } else {
-            System.out.println("❌ Invalid " + type + ": " + input + " (Format Mismatch)");
+            System.out.println("STATUS: ❌ UNSAFE");
+            System.out.println("Message: CRITICAL! Improper cargo detected in cylindrical bogie.");
         }
+
+        // 4. Testing a Violation Scenario
+        System.out.println("\n--- Testing Violation Scenario (Adding Cylindrical with Coal) ---");
+        goodsConsist.add(new GoodsBogie("Cylindrical", "Coal"));
+
+        // Short-circuit check
+        boolean isSafeAfterViolation = goodsConsist.stream().allMatch(bogie ->
+                !bogie.getType().equalsIgnoreCase("Cylindrical") ||
+                        bogie.getCargo().equalsIgnoreCase("Petroleum")
+        );
+
+        System.out.println("New Safety Status: " + (isSafeAfterViolation ? "✔ SAFE" : "❌ UNSAFE"));
     }
 }
