@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 class Bogie {
     private String name;
@@ -15,35 +14,36 @@ class Bogie {
 
     @Override
     public String toString() {
-        return "Bogie{Capacity=" + capacity + "}";
+        return String.format("%-15s (Seats: %d)", name, capacity);
     }
 }
 
 public class TrainConsistApp {
     public static void main(String[] args) {
-        // 1. Setup: Create a list with multiple bogies of the same types
+        // 1. Setup: Create a list of passenger bogies
         List<Bogie> consist = new ArrayList<>();
         consist.add(new Bogie("Sleeper", 72));
         consist.add(new Bogie("Sleeper", 72));
         consist.add(new Bogie("AC Chair Car", 56));
         consist.add(new Bogie("First Class", 24));
-        consist.add(new Bogie("AC Chair Car", 56));
+        consist.add(new Bogie("General", 90));
 
-        System.out.println("Processing " + consist.size() + " bogies for categorization...\n");
+        System.out.println("--- Current Train Composition ---");
+        consist.forEach(System.out::println);
 
-        // 2. Stream Pipeline: Grouping by Bogie Name
-        // Structure: Map<String, List<Bogie>>
-        Map<String, List<Bogie>> groupedBogies = consist.stream()
-                .collect(Collectors.groupingBy(Bogie::getName));
+        // 2. Stream Pipeline: Map to capacities and Reduce to a total
+        // .map(Bogie::getCapacity) transforms Stream<Bogie> to Stream<Integer>
+        // .reduce(0, Integer::sum) starts at 0 and adds every element
+        int totalSeats = consist.stream()
+                .map(Bogie::getCapacity)
+                .reduce(0, Integer::sum);
 
-        // 3. Display the grouped results
-        System.out.println("--- Consist Report (Grouped by Type) ---");
-        groupedBogies.forEach((type, list) -> {
-            System.out.println("Category: " + type + " | Count: " + list.size());
-            list.forEach(b -> System.out.println("  - " + b));
-        });
+        // 3. Display the result
+        System.out.println("\n-------------------------------------------");
+        System.out.println("TOTAL TRAIN SEATING CAPACITY: " + totalSeats);
+        System.out.println("-------------------------------------------");
 
-        // 4. Integrity Check
-        System.out.println("\nOriginal list size remains: " + consist.size());
+        // 4. Verify Original Integrity (Requirement)
+        System.out.println("Verification: Original bogie count remains " + consist.size());
     }
 }
