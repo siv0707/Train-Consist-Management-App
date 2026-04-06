@@ -49,5 +49,7 @@ public class TrainConsistApp {
         }
 
         System.out.println("\nPlanning Analysis: High-capacity bogies identified for optimal usage.");
+
+
     }
 }
