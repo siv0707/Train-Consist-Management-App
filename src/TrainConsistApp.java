@@ -1,33 +1,52 @@
-import java.util.Arrays;
-
 /**
- * UC17: Sort Bogie Names Using Arrays.sort()
- * Goal: Use Java's optimized library methods for alphabetical sorting.
+ * UC18: Linear Search for Bogie ID
+ * Goal: Manually traverse an array to find a specific String ID.
  */
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        // 1. Initialize an array of bogie type names
-        String[] bogieNames = {
-                "Sleeper",
-                "AC Chair",
-                "First Class",
-                "General",
-                "Luxury",
-                "Sleeper" // Included duplicate for testing
-        };
+        // 1. Array of Bogie IDs (Unsorted)
+        String[] bogieIDs = {"BG101", "BG205", "BG309", "BG412", "BG550"};
 
-        System.out.println("=== Railway Inventory Manager (Standard Sort) ===");
-        System.out.println("Original Inventory: " + Arrays.toString(bogieNames));
+        // Search Keys for testing
+        String searchKey1 = "BG309"; // Exists in middle
+        String searchKey2 = "BG999"; // Does not exist
+        String searchKey3 = "BG101"; // Exists at start (First element)
 
-        // 2. Use the built-in Arrays.sort() method
-        // This uses 'Natural Ordering' (Alphabetical for Strings)
-        Arrays.sort(bogieNames);
+        System.out.println("=== Railway Bogie Locator (Linear Search) ===");
 
-        // 3. Display the sorted result using Arrays.toString()
-        System.out.println("Sorted Inventory  : " + Arrays.toString(bogieNames));
+        // 2. Perform Searches
+        performSearch(bogieIDs, searchKey1);
+        performSearch(bogieIDs, searchKey2);
+        performSearch(bogieIDs, searchKey3);
+    }
 
-        // 4. Verification logic for reporting
-        System.out.println("\nReport Summary: " + bogieNames.length + " bogies categorized alphabetically.");
+    /**
+     * Logic for Linear Search
+     * Time Complexity: O(n)
+     */
+    public static void performSearch(String[] arr, String key) {
+        boolean found = false;
+        int position = -1;
+
+        System.out.println("\nSearching for Bogie ID: " + key + "...");
+
+        // 3. Sequential Traversal
+        for (int i = 0; i < arr.length; i++) {
+            // 4. Equality Comparison (using .equals() for Strings)
+            if (arr[i].equals(key)) {
+                found = true;
+                position = i;
+                // 5. Early Termination: Stop searching once found
+                break;
+            }
+        }
+
+        // 6. Display Result
+        if (found) {
+            System.out.println("✔ Result: Bogie " + key + " found at position (Index) " + position + ".");
+        } else {
+            System.out.println("❌ Result: Bogie " + key + " not found in the consist.");
+        }
     }
 }
