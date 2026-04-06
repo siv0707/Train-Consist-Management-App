@@ -1,70 +1,55 @@
-import java.util.Arrays;
+import java.util.*;
 
 /**
- * UC18: Binary Search for Bogie ID
- * PRECONDITION: The array MUST be sorted for Binary Search to work.
+ * UC20: Prevent Search on Empty Train
+ * Goal: Use IllegalStateException to handle invalid operational states.
  */
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        // 1. Sorted Array of Bogie IDs (Requirement for Binary Search)
-        String[] bogieIDs = {"BG101", "BG205", "BG309", "BG412", "BG550", "BG600", "BG710"};
+        // Scenario 1: An empty train consist
+        List<String> emptyConsist = new ArrayList<>();
 
-        // Search Keys for testing
-        String target1 = "BG550"; // Exists in upper half
-        String target2 = "BG101"; // Exists at the very start
-        String target3 = "BG999"; // Does not exist
+        // Scenario 2: A populated train consist
+        List<String> activeConsist = Arrays.asList("BG101", "BG205", "BG309");
 
-        System.out.println("=== Railway High-Speed Locator (Binary Search) ===");
-        System.out.println("Sorted Database: " + Arrays.toString(bogieIDs));
+        System.out.println("=== Railway Operational State Validator ===");
 
-        // 2. Perform Binary Searches
-        performBinarySearch(bogieIDs, target1);
-        performBinarySearch(bogieIDs, target2);
-        performBinarySearch(bogieIDs, target3);
+        // Attempting search on empty train
+        try {
+            System.out.println("\nCase 1: Searching empty consist...");
+            safeSearch(emptyConsist, "BG101");
+        } catch (IllegalStateException e) {
+            System.out.println("❌ Caught State Error: " + e.getMessage());
+        }
+
+        // Attempting search on active train
+        try {
+            System.out.println("\nCase 2: Searching active consist...");
+            safeSearch(activeConsist, "BG309");
+        } catch (IllegalStateException e) {
+            System.out.println("❌ Error: " + e.getMessage());
+        }
     }
 
     /**
-     * Manual implementation of Binary Search logic
-     * Time Complexity: O(log n)
+     * Performs a search only if the train state is valid (not empty).
+     * @throws IllegalStateException if the list is empty.
      */
-    public static void performBinarySearch(String[] arr, String key) {
-        int low = 0;
-        int high = arr.length - 1;
-        int position = -1;
-        boolean found = false;
-
-        System.out.println("\nLocating Bogie ID: " + key + "...");
-
-        // 3. Divide and Conquer Loop
-        while (low <= high) {
-            // 4. Compute Middle Index
-            int mid = low + (high - low) / 2;
-
-            // 5. Compare key with middle element using compareTo()
-            // compareTo returns: 0 if equal, <0 if key is smaller, >0 if key is larger
-            int comparison = key.compareTo(arr[mid]);
-
-            if (comparison == 0) {
-                found = true;
-                position = mid;
-                break; // Target found, exit loop
-            }
-            else if (comparison < 0) {
-                // Key is in the left half, adjust high pointer
-                high = mid - 1;
-            }
-            else {
-                // Key is in the right half, adjust low pointer
-                low = mid + 1;
-            }
+    public static void safeSearch(List<String> bogies, String key) {
+        // 1. State Validation (Defensive Programming)
+        if (bogies == null || bogies.isEmpty()) {
+            // 2. Throw IllegalStateException - the system is in the wrong state for this call
+            throw new IllegalStateException("Search Failed: The train consist is currently empty. Please attach bogies before searching.");
         }
 
-        // 6. Display Result
+        // 3. If validation passes, proceed with search logic (Linear Search example)
+        boolean found = bogies.contains(key);
+
         if (found) {
-            System.out.println("✔ Result: Bogie " + key + " identified at index " + position + ".");
+            System.out.println("✔ Success: Bogie " + key + " located in the consist.");
         } else {
-            System.out.println("❌ Result: Bogie " + key + " not found in the sorted consist.");
+            System.out.println("ℹ Info: Bogie " + key + " is not present in this consist.");
         }
     }
 }
