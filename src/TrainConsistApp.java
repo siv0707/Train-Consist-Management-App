@@ -15,39 +15,35 @@ class Bogie {
 
     @Override
     public String toString() {
-        return String.format("%-15s | Capacity: %d", name, capacity);
+        return "Bogie{Capacity=" + capacity + "}";
     }
 }
 
 public class TrainConsistApp {
     public static void main(String[] args) {
-        // 1. Setup: Create a list of bogies (Reuse logic from UC7)
+        // 1. Setup: Create a list with multiple bogies of the same types
         List<Bogie> consist = new ArrayList<>();
-        consist.add(new Bogie("General", 90));
+        consist.add(new Bogie("Sleeper", 72));
         consist.add(new Bogie("Sleeper", 72));
         consist.add(new Bogie("AC Chair Car", 56));
         consist.add(new Bogie("First Class", 24));
+        consist.add(new Bogie("AC Chair Car", 56));
 
-        System.out.println("Total Bogies in Consist: " + consist.size());
+        System.out.println("Processing " + consist.size() + " bogies for categorization...\n");
 
-        // 2. Define the Capacity Threshold
-        int threshold = 60;
-        System.out.println("Filtering bogies with capacity > " + threshold + "...\n");
+        // 2. Stream Pipeline: Grouping by Bogie Name
+        // Structure: Map<String, List<Bogie>>
+        Map<String, List<Bogie>> groupedBogies = consist.stream()
+                .collect(Collectors.groupingBy(Bogie::getName));
 
-        // 3. Stream API Pipeline: stream() -> filter() -> collect()
-        List<Bogie> highCapacityBogies = consist.stream()
-                .filter(b -> b.getCapacity() > threshold) // Lambda condition
-                .collect(Collectors.toList());            // Gather into new list
+        // 3. Display the grouped results
+        System.out.println("--- Consist Report (Grouped by Type) ---");
+        groupedBogies.forEach((type, list) -> {
+            System.out.println("Category: " + type + " | Count: " + list.size());
+            list.forEach(b -> System.out.println("  - " + b));
+        });
 
-        // 4. Display the results
-        if (highCapacityBogies.isEmpty()) {
-            System.out.println("No bogies found matching the criteria.");
-        } else {
-            System.out.println("--- High Capacity Bogies (Filtered) ---");
-            highCapacityBogies.forEach(System.out::println);
-        }
-
-        // 5. Verify Original Integrity (Requirement)
-        System.out.println("\nOriginal list size: " + consist.size() + " (Unchanged)");
+        // 4. Integrity Check
+        System.out.println("\nOriginal list size remains: " + consist.size());
     }
 }
