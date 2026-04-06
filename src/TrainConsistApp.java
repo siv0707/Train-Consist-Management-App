@@ -1,37 +1,53 @@
-import java.util.LinkedList;
+import java.util.*;
+
+// Bogie class representing the data structure
+class Bogie {
+    private String name;
+    private int capacity;
+
+    public Bogie(String name, int capacity) {
+        this.name = name;
+        this.capacity = capacity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%-15s | Capacity: %d", name, capacity);
+    }
+}
 
 public class TrainConsistApp {
-
     public static void main(String[] args) {
+        // 1. Create a List to store passenger bogies
+        List<Bogie> consist = new ArrayList<>();
 
-        System.out.println("=== Train Consist Management App ===");
+        // 2. Add bogies with different capacities
+        consist.add(new Bogie("Sleeper", 72));
+        consist.add(new Bogie("AC Chair Car", 56));
+        consist.add(new Bogie("First Class", 24));
+        consist.add(new Bogie("General", 90));
 
-        // UC4
-        System.out.println("\n--- UC4: Maintain Ordered Train Consist ---");
+        System.out.println("--- Original Consist (Unordered) ---");
+        consist.forEach(System.out::println);
 
-        // Create LinkedList for train consist
-        LinkedList<String> trainConsist = new LinkedList<>();
+        // 3. Apply Comparator to sort by capacity (Descending - High to Low)
+        // We use Comparator.comparingInt for performance and clarity
+        consist.sort(Comparator.comparingInt(Bogie::getCapacity).reversed());
 
-        // Add bogies
-        trainConsist.add("Engine");
-        trainConsist.add("Sleeper");
-        trainConsist.add("AC");
-        trainConsist.add("Cargo");
-        trainConsist.add("Guard");
+        System.out.println("\n--- Sorted Consist (Highest Capacity First) ---");
+        // 4. Display sorted bogies
+        for (Bogie b : consist) {
+            System.out.println(b);
+        }
 
-        System.out.println("Initial Train Consist: " + trainConsist);
-
-        // Insert Pantry Car at position 2
-        trainConsist.add(2, "Pantry");
-
-        System.out.println("\nAfter adding Pantry Car at position 2:");
-        System.out.println(trainConsist);
-
-        // Remove first and last bogie
-        trainConsist.removeFirst();
-        trainConsist.removeLast();
-
-        System.out.println("\nAfter removing first and last bogie:");
-        System.out.println(trainConsist);
+        System.out.println("\nPlanning Analysis: High-capacity bogies identified for optimal usage.");
     }
 }
