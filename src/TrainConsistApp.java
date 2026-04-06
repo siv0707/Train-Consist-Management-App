@@ -1,6 +1,6 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
-// Bogie class representing the data structure
 class Bogie {
     private String name;
     private int capacity;
@@ -10,13 +10,8 @@ class Bogie {
         this.capacity = capacity;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
+    public String getName() { return name; }
+    public int getCapacity() { return capacity; }
 
     @Override
     public String toString() {
@@ -26,30 +21,33 @@ class Bogie {
 
 public class TrainConsistApp {
     public static void main(String[] args) {
-        // 1. Create a List to store passenger bogies
+        // 1. Setup: Create a list of bogies (Reuse logic from UC7)
         List<Bogie> consist = new ArrayList<>();
-
-        // 2. Add bogies with different capacities
+        consist.add(new Bogie("General", 90));
         consist.add(new Bogie("Sleeper", 72));
         consist.add(new Bogie("AC Chair Car", 56));
         consist.add(new Bogie("First Class", 24));
-        consist.add(new Bogie("General", 90));
 
-        System.out.println("--- Original Consist (Unordered) ---");
-        consist.forEach(System.out::println);
+        System.out.println("Total Bogies in Consist: " + consist.size());
 
-        // 3. Apply Comparator to sort by capacity (Descending - High to Low)
-        // We use Comparator.comparingInt for performance and clarity
-        consist.sort(Comparator.comparingInt(Bogie::getCapacity).reversed());
+        // 2. Define the Capacity Threshold
+        int threshold = 60;
+        System.out.println("Filtering bogies with capacity > " + threshold + "...\n");
 
-        System.out.println("\n--- Sorted Consist (Highest Capacity First) ---");
-        // 4. Display sorted bogies
-        for (Bogie b : consist) {
-            System.out.println(b);
+        // 3. Stream API Pipeline: stream() -> filter() -> collect()
+        List<Bogie> highCapacityBogies = consist.stream()
+                .filter(b -> b.getCapacity() > threshold) // Lambda condition
+                .collect(Collectors.toList());            // Gather into new list
+
+        // 4. Display the results
+        if (highCapacityBogies.isEmpty()) {
+            System.out.println("No bogies found matching the criteria.");
+        } else {
+            System.out.println("--- High Capacity Bogies (Filtered) ---");
+            highCapacityBogies.forEach(System.out::println);
         }
 
-        System.out.println("\nPlanning Analysis: High-capacity bogies identified for optimal usage.");
-
-
+        // 5. Verify Original Integrity (Requirement)
+        System.out.println("\nOriginal list size: " + consist.size() + " (Unchanged)");
     }
 }
