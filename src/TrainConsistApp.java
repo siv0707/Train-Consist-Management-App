@@ -1,67 +1,53 @@
 import java.util.*;
 
-/**
- * UC12: Safety Compliance Check for Goods Bogies
- * Enforces domain rules: Cylindrical bogies MUST carry Petroleum.
- */
-class GoodsBogie {
-    private String type;  // e.g., "Cylindrical", "Open", "Box"
-    private String cargo; // e.g., "Petroleum", "Coal", "Grain"
+// Bogie class representing the data structure
+class Bogie {
+    private String name;
+    private int capacity;
 
-    public GoodsBogie(String type, String cargo) {
-        this.type = type;
-        this.cargo = cargo;
+    public Bogie(String name, int capacity) {
+        this.name = name;
+        this.capacity = capacity;
     }
 
-    public String getType() { return type; }
-    public String getCargo() { return cargo; }
+    public String getName() {
+        return name;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
 
     @Override
     public String toString() {
-        return String.format("[%s Bogie | Cargo: %s]", type, cargo);
+        return String.format("%-15s | Capacity: %d", name, capacity);
     }
 }
 
 public class TrainConsistApp {
     public static void main(String[] args) {
-        // 1. Prepare a list of goods bogies (Scenario: Mixed Cargo)
-        List<GoodsBogie> goodsConsist = new ArrayList<>();
-        goodsConsist.add(new GoodsBogie("Open", "Coal"));
-        goodsConsist.add(new GoodsBogie("Box", "Grain"));
-        goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        // 1. Create a List to store passenger bogies
+        List<Bogie> consist = new ArrayList<>();
 
-        System.out.println("--- Current Goods Train Formation ---");
-        goodsConsist.forEach(System.out::println);
+        // 2. Add bogies with different capacities
+        consist.add(new Bogie("Sleeper", 72));
+        consist.add(new Bogie("AC Chair Car", 56));
+        consist.add(new Bogie("First Class", 24));
+        consist.add(new Bogie("General", 90));
 
-        // 2. Safety Validation Rule using Stream.allMatch()
-        // Rule: If Type is "Cylindrical", Cargo MUST be "Petroleum".
-        boolean isSafe = goodsConsist.stream().allMatch(bogie -> {
-            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
-                return bogie.getCargo().equalsIgnoreCase("Petroleum");
-            }
-            return true; // Other bogie types pass this specific rule
-        });
+        System.out.println("--- Original Consist (Unordered) ---");
+        consist.forEach(System.out::println);
 
-        // 3. Display Safety Result
-        System.out.println("\n--- Safety Compliance Report ---");
-        if (isSafe) {
-            System.out.println("STATUS: ✔ SAFE");
-            System.out.println("Message: All cylindrical bogies are carrying approved liquid cargo.");
-        } else {
-            System.out.println("STATUS: ❌ UNSAFE");
-            System.out.println("Message: CRITICAL! Improper cargo detected in cylindrical bogie.");
+        // 3. Apply Comparator to sort by capacity (Descending - High to Low)
+        // We use Comparator.comparingInt for performance and clarity
+        consist.sort(Comparator.comparingInt(Bogie::getCapacity).reversed());
+
+        System.out.println("\n--- Sorted Consist (Highest Capacity First) ---");
+        // 4. Display sorted bogies
+        for (Bogie b : consist) {
+            System.out.println(b);
         }
 
-        // 4. Testing a Violation Scenario
-        System.out.println("\n--- Testing Violation Scenario (Adding Cylindrical with Coal) ---");
-        goodsConsist.add(new GoodsBogie("Cylindrical", "Coal"));
-
-        // Short-circuit check
-        boolean isSafeAfterViolation = goodsConsist.stream().allMatch(bogie ->
-                !bogie.getType().equalsIgnoreCase("Cylindrical") ||
-                        bogie.getCargo().equalsIgnoreCase("Petroleum")
-        );
-
-        System.out.println("New Safety Status: " + (isSafeAfterViolation ? "✔ SAFE" : "❌ UNSAFE"));
+        System.out.println("\nPlanning Analysis: High-capacity bogies identified for optimal usage.");
     }
 }
