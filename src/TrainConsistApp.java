@@ -1,49 +1,56 @@
-import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
-class Bogie {
-    private String name;
-    private int capacity;
-
-    public Bogie(String name, int capacity) {
-        this.name = name;
-        this.capacity = capacity;
-    }
-
-    public String getName() { return name; }
-    public int getCapacity() { return capacity; }
-
-    @Override
-    public String toString() {
-        return String.format("%-15s (Seats: %d)", name, capacity);
-    }
-}
-
+/**
+ * UC11: Validate Train ID & Cargo Codes (Regex)
+ * This class ensures that all input follows strict railway formatting rules.
+ */
 public class TrainConsistApp {
+
+    // Regex Patterns:
+    // TRN-\\d{4} ensures "TRN-" followed by exactly 4 digits.
+    // PET-[A-Z]{2} ensures "PET-" followed by exactly 2 uppercase letters.
+    private static final String TRAIN_ID_REGEX = "TRN-\\d{4}";
+    private static final String CARGO_CODE_REGEX = "PET-[A-Z]{2}";
+
     public static void main(String[] args) {
-        // 1. Setup: Create a list of passenger bogies
-        List<Bogie> consist = new ArrayList<>();
-        consist.add(new Bogie("Sleeper", 72));
-        consist.add(new Bogie("Sleeper", 72));
-        consist.add(new Bogie("AC Chair Car", 56));
-        consist.add(new Bogie("First Class", 24));
-        consist.add(new Bogie("General", 90));
+        // Test Data for Train IDs
+        String[] testTrainIDs = {"TRN-1234", "TRAIN12", "TRN-123", "TRN-5566A", "1234-TRN"};
 
-        System.out.println("--- Current Train Composition ---");
-        consist.forEach(System.out::println);
+        // Test Data for Cargo Codes
+        String[] testCargoCodes = {"PET-AB", "PET-bc", "PET12", "PET-XYZ", "PET-XY"};
 
-        // 2. Stream Pipeline: Map to capacities and Reduce to a total
-        // .map(Bogie::getCapacity) transforms Stream<Bogie> to Stream<Integer>
-        // .reduce(0, Integer::sum) starts at 0 and adds every element
-        int totalSeats = consist.stream()
-                .map(Bogie::getCapacity)
-                .reduce(0, Integer::sum);
+        System.out.println("=== Railway Input Validation (UC11) ===");
 
-        // 3. Display the result
-        System.out.println("\n-------------------------------------------");
-        System.out.println("TOTAL TRAIN SEATING CAPACITY: " + totalSeats);
-        System.out.println("-------------------------------------------");
+        // Validate Train IDs
+        System.out.println("\n--- Validating Train IDs (Required: TRN-DDDD) ---");
+        for (String id : testTrainIDs) {
+            checkFormat(id, TRAIN_ID_REGEX, "Train ID");
+        }
 
-        // 4. Verify Original Integrity (Requirement)
-        System.out.println("Verification: Original bogie count remains " + consist.size());
+        // Validate Cargo Codes
+        System.out.println("\n--- Validating Cargo Codes (Required: PET-AA) ---");
+        for (String code : testCargoCodes) {
+            checkFormat(code, CARGO_CODE_REGEX, "Cargo Code");
+        }
+
+        System.out.println("\nValidation process complete. Only '✔ Valid' data will be processed.");
+    }
+
+    /**
+     * core validation logic using Pattern and Matcher
+     */
+    private static void checkFormat(String input, String regex, String type) {
+        // Compile the regex pattern
+        Pattern pattern = Pattern.compile(regex);
+        // Create matcher for the input string
+        Matcher matcher = pattern.matcher(input);
+
+        // matches() checks the ENTIRE string against the pattern
+        if (matcher.matches()) {
+            System.out.println("✔ Valid " + type + ": " + input);
+        } else {
+            System.out.println("❌ Invalid " + type + ": " + input + " (Format Mismatch)");
+        }
     }
 }
