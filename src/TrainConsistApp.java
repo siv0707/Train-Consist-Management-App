@@ -1,53 +1,67 @@
 import java.util.*;
 
-// Bogie class representing the data structure
+// 1. Define the Custom Exception
+// We extend Exception to create a 'Checked Exception'
+class InvalidCapacityException extends Exception {
+    public InvalidCapacityException(String message) {
+        super(message);
+    }
+}
+
+// 2. Bogie class with Fail-Fast Validation
 class Bogie {
     private String name;
     private int capacity;
 
-    public Bogie(String name, int capacity) {
+    // The constructor 'throws' the exception if validation fails
+    public Bogie(String name, int capacity) throws InvalidCapacityException {
+        if (capacity <= 0) {
+            throw new InvalidCapacityException("Invalid Capacity: [" + capacity +
+                    "]. Capacity for " + name + " must be greater than zero.");
+        }
         this.name = name;
         this.capacity = capacity;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
     @Override
     public String toString() {
-        return String.format("%-15s | Capacity: %d", name, capacity);
+        return String.format("%-15s | Seats: %d", name, capacity);
     }
 }
 
 public class TrainConsistApp {
     public static void main(String[] args) {
-        // 1. Create a List to store passenger bogies
         List<Bogie> consist = new ArrayList<>();
 
-        // 2. Add bogies with different capacities
-        consist.add(new Bogie("Sleeper", 72));
-        consist.add(new Bogie("AC Chair Car", 56));
-        consist.add(new Bogie("First Class", 24));
-        consist.add(new Bogie("General", 90));
+        System.out.println("=== Train Consist Creation with Validation ===\n");
 
-        System.out.println("--- Original Consist (Unordered) ---");
-        consist.forEach(System.out::println);
-
-        // 3. Apply Comparator to sort by capacity (Descending - High to Low)
-        // We use Comparator.comparingInt for performance and clarity
-        consist.sort(Comparator.comparingInt(Bogie::getCapacity).reversed());
-
-        System.out.println("\n--- Sorted Consist (Highest Capacity First) ---");
-        // 4. Display sorted bogies
-        for (Bogie b : consist) {
-            System.out.println(b);
+        // Test Case 1: Valid Capacity
+        try {
+            System.out.println("Attempting to add Sleeper (72 seats)...");
+            consist.add(new Bogie("Sleeper", 72));
+            System.out.println("✔ Successfully added.");
+        } catch (InvalidCapacityException e) {
+            System.err.println("❌ Error: " + e.getMessage());
         }
 
-        System.out.println("\nPlanning Analysis: High-capacity bogies identified for optimal usage.");
+        // Test Case 2: Zero Capacity (Invalid)
+        try {
+            System.out.println("\nAttempting to add AC Chair (0 seats)...");
+            consist.add(new Bogie("AC Chair", 0));
+        } catch (InvalidCapacityException e) {
+            System.out.println("❌ Caught Expected Exception: " + e.getMessage());
+        }
+
+        // Test Case 3: Negative Capacity (Invalid)
+        try {
+            System.out.println("\nAttempting to add First Class (-10 seats)...");
+            consist.add(new Bogie("First Class", -10));
+        } catch (InvalidCapacityException e) {
+            System.out.println("❌ Caught Expected Exception: " + e.getMessage());
+        }
+
+        System.out.println("\n--- Final Valid Consist ---");
+        consist.forEach(System.out::println);
+        System.out.println("Total valid bogies: " + consist.size());
     }
 }
