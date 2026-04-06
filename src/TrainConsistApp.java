@@ -1,71 +1,56 @@
-import java.util.*;
+import java.util.Arrays;
 
-// 1. Custom Runtime Exception for operational safety
-class CargoSafetyException extends RuntimeException {
-    public CargoSafetyException(String message) {
-        super(message);
-    }
-}
-
-class GoodsBogie {
-    private String shape; // "Rectangular" or "Cylindrical"
-    private String cargo = "Empty";
-
-    public GoodsBogie(String shape) {
-        this.shape = shape;
-    }
-
-    // 2. Method to assign cargo with safety logic
-    public void assignCargo(String newCargo) {
-        System.out.println("\n>>> Attempting to assign [" + newCargo + "] to [" + shape + "] bogie...");
-
-        // Business Rule: Petroleum requires a Cylindrical bogie
-        if (newCargo.equalsIgnoreCase("Petroleum") && shape.equalsIgnoreCase("Rectangular")) {
-            throw new CargoSafetyException("SAFETY ALERT: Petroleum cannot be assigned to a Rectangular bogie (Leak Risk)!");
-        }
-
-        this.cargo = newCargo;
-        System.out.println("✔ Assignment Successful: " + shape + " is now carrying " + cargo);
-    }
-
-    public String getStatus() {
-        return shape + " Bogie | Current Cargo: " + cargo;
-    }
-}
-
+/**
+ * UC16: Sort Passenger Bogies by Capacity (Bubble Sort)
+ * Goal: Manually sort an array without using library methods like Arrays.sort().
+ */
 public class TrainConsistApp {
+
     public static void main(String[] args) {
-        GoodsBogie rectBogie = new GoodsBogie("Rectangular");
-        GoodsBogie cylBogie = new GoodsBogie("Cylindrical");
+        // 1. Initialize an unsorted array of passenger bogie capacities
+        int[] capacities = {72, 56, 24, 70, 60, 56}; // Includes a duplicate (56)
 
-        // 3. Structured Exception Handling
-        String[] cargoRequests = {"Grain", "Petroleum", "Coal"};
+        System.out.println("=== Railway Capacity Optimizer (Manual Sort) ===");
+        System.out.println("Original Capacities: " + Arrays.toString(capacities));
 
-        for (String request : cargoRequests) {
-            try {
-                // Testing the Rectangular bogie with various cargoes
-                rectBogie.assignCargo(request);
-            } catch (CargoSafetyException e) {
-                // Handle the domain-specific error
-                System.out.println("❌ ERROR CAUGHT: " + e.getMessage());
-            } finally {
-                // Mandatory logic (Cleanup or Logging)
-                System.out.println("[System Log]: Cargo validation cycle completed for request: " + request);
+        // 2. Perform Bubble Sort Algorithm
+        bubbleSort(capacities);
+
+        // 3. Display Result
+        System.out.println("Sorted Capacities  : " + Arrays.toString(capacities));
+        System.out.println("\nLogic Check: High-capacity bogies are now positioned at the end of the array.");
+    }
+
+    /**
+     * Manual implementation of Bubble Sort
+     * Time Complexity: O(n^2)
+     */
+    public static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        boolean swapped;
+
+        // Outer loop for multiple passes
+        for (int i = 0; i < n - 1; i++) {
+            swapped = false;
+
+            // Inner loop for adjacent comparisons
+            // (n - 1 - i) because the largest elements "bubble" to the end each pass
+            for (int j = 0; j < n - 1 - i; j++) {
+
+                // Compare adjacent elements
+                if (arr[j] > arr[j + 1]) {
+
+                    // 4. Swapping Logic using a temporary variable
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+
+                    swapped = true;
+                }
             }
-        }
 
-        // Test a valid assignment to show program continuation
-        try {
-            cylBogie.assignCargo("Petroleum");
-        } catch (CargoSafetyException e) {
-            System.out.println("❌ Error: " + e.getMessage());
-        } finally {
-            System.out.println("[System Log]: Final validation cycle completed.");
+            // Optimization: If no two elements were swapped by inner loop, then break
+            if (!swapped) break;
         }
-
-        System.out.println("\n--- Final Train Status ---");
-        System.out.println(rectBogie.getStatus());
-        System.out.println(cylBogie.getStatus());
-        System.out.println("System remains operational. No crashes occurred.");
     }
 }
